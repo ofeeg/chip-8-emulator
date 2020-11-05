@@ -4,7 +4,7 @@ CXXFLAGS=-std=c++17
 #INCLUDES=-I "/home/projects/chip-8-emulator"
 
 #CXXFLAGS += -Ofast
-CXXFLAGS += -Og -g -fsanitize=address
+CXXFLAGS += -Og -g #-fsanitize=address
 #CXXFLAGS += -fopenmp
 #CPPFLAGS += -I
 CXXFLAGS += $(shell pkg-config sdl2 --cflags)

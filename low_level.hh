@@ -26,13 +26,14 @@ public:
   typedef void (chip_8::*chip_8_func)();
   chip_8_func table[0xF + 1]{&chip_8::OP_NULL};
   chip_8_func table0[0xE + 1]{&chip_8::OP_NULL};
-  void table_0(){((*this).*(table0[opcode & 0x000Fu]))();}
   chip_8_func table8[0xE + 1]{&chip_8::OP_NULL};
-  void table_8(){((*this).*(table8[opcode & 0x000Fu]))();}
   chip_8_func tableE[0xE + 1]{&chip_8::OP_NULL};
-  void table_E(){((*this).*(tableE[opcode & 0x000Fu]))();}
   chip_8_func tableF[0x65 + 1]{&chip_8::OP_NULL};
-  void table_F(){((*this).*(tableF[opcode & 0x00FFu]))();}
+  void table_8();
+  void table_0();
+  void table_E();
+  void table_F();
+
   std::default_random_engine randGen;
   std::uniform_int_distribution<unsigned char> rand_byte;
 

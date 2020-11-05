@@ -41,6 +41,7 @@ chip_8::chip_8() : randGen(std::chrono::system_clock::now().time_since_epoch().c
   table[0x5]=&chip_8::OP_5xy0;
   table[0x6]=&chip_8::OP_6xkk;
   table[0x7]=&chip_8::OP_7xkk;
+  table[0x8]=&chip_8::table_8;
   table[0x9]=&chip_8::OP_9xy0;
   table[0xA]=&chip_8::OP_Annn;
   table[0xB]=&chip_8::OP_Bnnn;
@@ -83,11 +84,15 @@ void chip_8::cycle(){
 
   //decode and execute
   ((*this).*(table[(opcode & 0xF000u) >> 12u]))();
-
+  
   if(delay_timer > 0){--delay_timer;}
   if(sound_timer > 0){--sound_timer;}
 }
 
+void chip_8::table_8(){((*this).*(chip_8::table8[opcode & 0x000Fu]))();}
+void chip_8::table_0(){((*this).*(chip_8::table0[opcode & 0x000Fu]))();}
+void chip_8::table_E(){((*this).*(chip_8::tableE[opcode & 0x000Fu]))();}
+void chip_8::table_F(){((*this).*(chip_8::tableF[opcode & 0x00FFu]))();}
 
 void chip_8::load_rom(char const* filename){
   std::ifstream file(filename, std::ios::binary | std::ios::ate); //open file as a stream of  binary and  point at the end
@@ -114,12 +119,12 @@ void chip_8::OP_00EE(){ //RET
 }
 
 void chip_8::OP_1nnn(){ // JP addr
-  unsigned short address = opcode & 0xFFFu;
+  unsigned short address = opcode & 0x0FFFu;
   pc = address;
 }
 
 void chip_8::OP_2nnn(){ //CALL addr
-  unsigned short address = opcode & 0xFFFu;
+  unsigned short address = opcode & 0x0FFFu;
   stack[sp] = pc;
   ++sp;
   pc = address;
@@ -213,8 +218,12 @@ void chip_8::OP_8xy6(){ //SHR Vx
 void chip_8::OP_8xy7(){ //SUBN Vx, Vy
   unsigned char Vx = (opcode & 0x0F00u) >> 8u;
   unsigned char Vy = (opcode & 0x00F0u) >> 4u;
-  if(registers[Vy] > registers[Vx]){registers[0xF] = 1;}
-  else{registers[0xF] = 0;}
+  if(registers[Vy] > registers[Vx]){
+    registers[0xF] = 1;
+  }
+  else{
+    registers[0xF] = 0;
+  }
   registers[Vx] = registers[Vy] - registers[Vx];
 }
 
@@ -321,7 +330,7 @@ void chip_8::OP_Fx18(){// LD ST, Vx
 
 void chip_8::OP_Fx1E(){// ADD I, Vx
   unsigned char Vx = (opcode & 0x0F00u) >> 8u;
-  I+=registers[Vx];
+  I += registers[Vx];
 }
 
 void chip_8::OP_Fx29(){// LD F, Vx
